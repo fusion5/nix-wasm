@@ -1,26 +1,29 @@
 # nix-wasm
 
 [![Nix Flake](https://img.shields.io/badge/Nix-Flake-blue.svg)](https://nixos.wiki/wiki/Flakes)
-> A reproducible development environment for Haskell wasm development using cabal
+> A reproducible development environment for Haskell WASM development using Cabal
 
 Motivation:
 
-To develop a Haskell [wasm](https://webassembly.org/) project using cabal, you need the 
-wasm-specific tools, and a set of libraries (project dependencies) compiled for wasm.
+To develop a Haskell [WASM](https://webassembly.org/) project using Cabal, you need the 
+WASM-specific tools, and a set of packages (project dependencies) compiled for WASM.
 
-By default, cabal installs packages in the global repository from hackage. 
-This is undesirable, because it leads to unreproducible builds: the build might work today and 
-on your system, but if some hackage packages perform breaking updates or if you try to build 
-the project on a different system then the build might not work anymore.
-The approach is to use hackage libraries from the nix repository instead, which are fixed 
-by `flake.lock` and result in reproducible builds.
+Without nix-wasm, you can build a Haskell WASM project with Cabal, it just downloads everything 
+from Hackage and builds it locally. This is undesirable, because it leads to unreproducible 
+builds: the build might work today and on your system, but if some Hackage packages perform 
+breaking updates or if you try to build the project on a different system then the build might 
+not work anymore.
 
-This readme file assumes that you are familiar with `cabal` and with `nix flake`.
+The approach in nix-wasm is to use Hackage packages from the nix repository, creating a separate 
+derivation for every Haskell package it knows, which is then exposed as a package set that can be 
+extended by the user. This results in reproducible builds.
+
+This readme file assumes some familiarity with `cabal` and with `nix flake`.
 
 ## Prerequisites
 
 - A .cabal file of your Haskell project
-- Cabal must not be configured to download from remote repositories such as hackage; in the cabal 
+- Cabal must not be configured to download from remote repositories such as Hackage; in the Cabal 
 configuration file (typically `~/.config/cabal/config`) you should have the following lines 
 commented out:
     ```
@@ -37,7 +40,7 @@ commented out:
 nix develop
 ```
 
-This way you enter into a shell with the wasm tool-set in the execution path
+This way you enter into a shell with the WASM tool-set in the execution path
 (e.g. `wasm32-wasi-cabal`, ...)
 
 Note: at the time of writing, `nix develop` fails with the error:
@@ -143,7 +146,7 @@ outputs =
   };
 ```
 
-Notice that for the non-wasm haskell tools, the language server, the `ghc912` package set is used.
+Notice that for the non-WASM Haskell tools, the language server, the `ghc912` package set is used.
 This means that the language server will build your project against this ghc version, so be 
 conscious of potential differences between versions.
 
@@ -157,10 +160,10 @@ The example above also provides two additional scripts in your development shell
 
 - `wasm-cabal` is a convenience wrapper around `wasm32-wasi-cabal`
 - `wasm-distribute` prepares your binary for the web and copies it to e.g. a `static/` directory,
-    alongisde `ghc_wasm_jsffi.js` which must be loaded in the browser also.
+    alongside `ghc_wasm_jsffi.js` which must be loaded in the browser also.
     If your cabal executable is e.g. `executable my-project-executable` then you'd use
     `wasm-distribute my-project-executable ./static/`
 
-You use these scripts to test your wasm build and to deploy the wasm file on your web server.
+You use these scripts to test your WASM build and to deploy the WASM file on your web server.
 For instructions on how to include these in the browser see the 
 [ghc documentation](https://ghc.gitlab.haskell.org/ghc/doc/users_guide/wasm.html#the-javascript-api)
